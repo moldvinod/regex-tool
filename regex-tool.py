@@ -16,6 +16,15 @@ class Colors:
     CYAN = '\033[96m'
     RESET = '\033[0m'
 
+# Try to enable readline for better input handling
+try:
+    import readline
+    # Enable history and arrow key navigation
+    readline.parse_and_bind("tab: complete")
+    readline.set_history_length(100)
+except ImportError:
+    pass  # Continue without readline if unavailable
+
 def colorize_matches(text, pattern, color_code=Colors.RED):
     """Apply color to regex matches in text"""
     try:
@@ -43,6 +52,19 @@ def colorize_matches(text, pattern, color_code=Colors.RED):
     output.append(text[last_end:])
     
     return ''.join(output), match_count
+
+def get_multiline_input(prompt=""):
+    """Get multi-line input with proper handling"""
+    print(prompt + " (Press Ctrl+D or Ctrl+Z when finished):")
+    lines = []
+    try:
+        while True:
+            line = input()
+            lines.append(line)
+    except EOFError:
+        pass  # Ctrl+D pressed
+    
+    return '\n'.join(lines)
 
 def main():
     parser = argparse.ArgumentParser(
@@ -85,22 +107,16 @@ def main():
             print(f"Error reading file: {str(e)}")
             sys.exit(1)
     else:
-        # Interactive mode
+        # Interactive mode with proper multi-line input
         print(f"{Colors.CYAN}Regex Learning Tool (Interactive Mode){Colors.RESET}")
-        print("Enter text (press Ctrl+D when finished):")
-        try:
-            text = sys.stdin.read().strip()
-        except KeyboardInterrupt:
-            sys.exit(0)
-        
+        text = get_multiline_input("Enter text to test against")
         if not text:
             print("No text provided. Exiting.")
             sys.exit(0)
     
     # Pattern handling
     pattern = args.pattern
-    if not pattern:
-        print(f"\n{Colors.CYAN}Enter regex patterns to test (Ctrl+C to exit):{Colors.RESET}")
+    print(f"\n{Colors.CYAN}Enter regex patterns to test (Ctrl+C to exit):{Colors.RESET}")
     
     while True:
         try:
@@ -122,7 +138,7 @@ def main():
                 print(result)
                 print("-" * 50)
             
-            # Reset pattern for next iteration in interactive mode
+            # Reset pattern for next iteration
             pattern = None
             
         except re.error as e:
