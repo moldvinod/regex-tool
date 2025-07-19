@@ -17,6 +17,15 @@ class Colors:
     CYAN = '\033[96m'
     RESET = '\033[0m'
 
+# Group colors for different capture groups
+GROUP_COLORS = [
+    Colors.GREEN,
+    Colors.BLUE,
+    Colors.MAGENTA,
+    Colors.CYAN,
+    Colors.YELLOW
+]
+
 # Try to enable readline for better input handling
 try:
     import readline
@@ -26,7 +35,7 @@ try:
 except ImportError:
     pass  # Continue without readline if unavailable
 
-def colorize_matches(text, pattern, color_code=Colors.RED):
+def colorize_matches(text, pattern, base_color=Colors.RED):
     """Apply color to regex matches in text and return match objects"""
     try:
         compiled = re.compile(pattern)
@@ -41,19 +50,68 @@ def colorize_matches(text, pattern, color_code=Colors.RED):
     for match in compiled.finditer(text):
         all_matches.append(match)
         start, end = match.span()
+        match_count += 1
         
         # Add non-matched part
         output.append(text[last_end:start])
         
-        # Add colored match
-        output.append(f"{color_code}{text[start:end]}{Colors.RESET}")
+        # Process matched part with group coloring
+        match_output = []
+        match_output.append(base_color + match.group(0))  # Base color for full match
         
+        # Color each capture group
+        for group_num in range(1, len(match.groups()) + 1):
+            group_start, group_end = match.span(group_num)
+            if group_start == -1 and group_end == -1:  # Skip non-participating groups
+                continue
+                
+            group_text = match.group(group_num)
+            if group_text is None:  # Skip None groups
+                continue
+                
+            # Get color for this group (cycle through group colors)
+            group_color = GROUP_COLORS[(group_num - 1) % len(GROUP_COLORS)]
+            
+            # Override the base color for this group
+            group_len = group_end - group_start
+            match_len = len(match_output)
+            
+            # Create a new string with the group colored
+            new_match_output = []
+            current_pos = 0
+            for part in match_output:
+                new_match_output.append(part)
+                current_pos += len(part) - len(base_color) - len(Colors.RESET)
+            
+            # Convert to string and find positions
+            full_match_text = ''.join(match_output)
+            plain_text = full_match_text.replace(base_color, '').replace(Colors.RESET, '')
+            
+            # Calculate positions relative to plain text
+            rel_group_start = group_start - start
+            rel_group_end = rel_group_start + group_len
+            
+            # Build new colored match text
+            new_output = []
+            new_output.append(plain_text[:rel_group_start])
+            new_output.append(group_color + plain_text[rel_group_start:rel_group_end] + Colors.RESET)
+            new_output.append(plain_text[rel_group_end:])
+            
+            # Reapply base color to non-group parts
+            colored_text = base_color + new_output[0]
+            colored_text += new_output[1]  # Already colored group
+            colored_text += base_color + new_output[2] + Colors.RESET
+            
+            match_output = [colored_text]
+        
+        # Add the colored match to output
+        output.extend(match_output)
         last_end = end
-        match_count += 1
     
     # Add remaining text
     output.append(text[last_end:])
     
+    # Combine all parts and reset colors at the end
     return ''.join(output), match_count, all_matches
 
 def show_captured_groups(matches, pattern):
@@ -77,7 +135,7 @@ def show_captured_groups(matches, pattern):
     
     for i, match in enumerate(matches, 1):
         print(f"{Colors.YELLOW}Match {i} at position [{match.start()}-{match.end()}]:{Colors.RESET}")
-        print(f"  Full match: {Colors.GREEN}{match.group(0)}{Colors.RESET}")
+        print(f"  Full match: {Colors.RED}{match.group(0)}{Colors.RESET}")
         
         if match.groups():
             print(f"  Captured groups:")
@@ -85,7 +143,8 @@ def show_captured_groups(matches, pattern):
                 names = group_names.get(idx, [])
                 name_str = f" ({', '.join(names)})" if names else ""
                 value = match.group(idx)
-                print(f"    Group {idx}{name_str}: {Colors.GREEN}{value if value else 'None'}{Colors.RESET}")
+                group_color = GROUP_COLORS[(idx - 1) % len(GROUP_COLORS)]
+                print(f"    Group {idx}{name_str}: {group_color}{value if value else 'None'}{Colors.RESET}")
         else:
             print(f"  {Colors.BLUE}No captured groups in pattern{Colors.RESET}")
         
