@@ -12,3 +12,4 @@ pattern \d$ mathes digits at the end of li e
 pattern \d{2} mathes any 2 digits
 pattern \d{1} mathes any 1 digits
 pattern \d{1,8} mathes any 1-8 digits
+pattern \d{4,8} mathes any 4-8 digits
