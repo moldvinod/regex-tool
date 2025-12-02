@@ -1,4 +1,5 @@
 #!/data/data/com.termux/files/usr/bin/python3
+#!/usr/bin/env python3
 
 import re
 import sys
