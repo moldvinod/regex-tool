@@ -8,3 +8,4 @@ eg1: "text is bad" pattern: `^\w+?`; matches the first word "text"
 test patternn: 8hduhh 73656 htgjgd 533d
 pattern  matxhes the 5 digits
 pattern \d{5} matxhes the 5 digits
+pattern \d$ mathes digits at the end of li e
