@@ -9,3 +9,4 @@ test patternn: 8hduhh 73656 htgjgd 533d
 pattern  matxhes the 5 digits
 pattern \d{5} matxhes the 5 digits
 pattern \d$ mathes digits at the end of li e
+pattern \d{2} mathes any 2 digits
