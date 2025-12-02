@@ -5,3 +5,4 @@ you can make the script executable before using: `chmod +x regex-tool.py` or use
 example usage: run the script, provide text, then pattern
 eg1: 'text is bad' pattern: ; matches the first word 'text'
 eg1: "text is bad" pattern: `^\w+?`; matches the first word "text"
+test patternn: 8hduhh 73656 htgjgd 533d
