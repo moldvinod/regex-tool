@@ -3,3 +3,5 @@ the tool uses python native regex engine so adjust your pattern accordingly
 put your pattern in the input section followed by the test text and you will see color-highlighted matches of your pattern.
 you can make the script executable before using: `chmod +x regex-tool.py` or use it with `./regex-tool.py`
 example usage: run the script, provide text, then pattern
+eg1: 'text is bad' pattern: ; matches the first word 'text'
+eg1: "text is bad" pattern: `^\w+?`; matches the first word "text"
