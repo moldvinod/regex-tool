@@ -15,3 +15,4 @@ pattern \d{1,8} mathes any 1-8 digits
 pattern \d{4,8} mathes any 4-8 digits
 pattern \d{4,34} mathes any 4-34 digits
 pattern \d{44,356} mathes any 44-356 digits
+pattern \w{3} mathes any 3 characters
